@@ -7,8 +7,10 @@ import (
 	"errors"
 	"io"
 	"net/http"
+	"strconv"
 
 	"github.com/bootcamp-go/web/response"
+	"github.com/go-chi/chi/v5"
 )
 
 // VehicleJSON is a struct that represents a vehicle in JSON format
@@ -155,5 +157,57 @@ func (h *VehicleDefault) Create() http.HandlerFunc {
 		response.JSON(w, http.StatusCreated, map[string]any{
 			"message": internal.MesgVehicleCreated,
 		})
+	}
+}
+
+// GetByColorAndYear is a method that returns a handler for the route GET /vehicles/color/{color}/year/{year}
+func (h *VehicleDefault) GetByColorAndYear() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// request
+		// - get color and year from url
+		color := chi.URLParam(r, "color")
+		year, err := strconv.Atoi(chi.URLParam(r, "year"))
+		if err != nil {
+			response.JSON(w, http.StatusBadRequest, map[string]any{
+				"message": err.Error(),
+			})
+			return
+		}
+
+		// process
+		// - get vehicles by color and year
+		v, err := h.sv.GetByColorAndYear(color, year)
+		if err != nil {
+			response.JSON(w, http.StatusInternalServerError, map[string]any{
+				"message": err.Error(),
+			})
+			return
+		}
+
+		// response
+		data := make(map[int]VehicleJSON)
+		for key, value := range v {
+			data[key] = VehicleJSON{
+				ID:              value.Id,
+				Brand:           value.Brand,
+				Model:           value.Model,
+				Registration:    value.Registration,
+				Color:           value.Color,
+				FabricationYear: value.FabricationYear,
+				Capacity:        value.Capacity,
+				MaxSpeed:        value.MaxSpeed,
+				FuelType:        value.FuelType,
+				Transmission:    value.Transmission,
+				Weight:          value.Weight,
+				Height:          value.Height,
+				Length:          value.Length,
+				Width:           value.Width,
+			}
+		}
+		response.JSON(w, http.StatusOK, map[string]any{
+			"message": "success",
+			"data":    data,
+		})
+
 	}
 }

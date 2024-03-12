@@ -24,3 +24,9 @@ func (s *VehicleDefault) Create(v internal.Vehicle) (err error) {
 	err = s.rp.Create(v)
 	return
 }
+
+// GetByColorAndYear is a method that returns a map of vehicles by color and year
+func (s *VehicleDefault) GetByColorAndYear(color string, year int) (v map[int]internal.Vehicle, err error) {
+	v, err = s.rp.GetByColorAndYear(color, year)
+	return
+}

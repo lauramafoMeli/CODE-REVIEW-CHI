@@ -55,4 +55,5 @@ var (
 	// errors
 	ErrVehicleAlreadyExists = errors.New("409 Conflict: Identificador del vehículo ya existente.")
 	ErrFieldsMissing        = errors.New("400 Bad Request: Datos del vehículo mal formados o incompletos.")
+	ErrVehicleNotFound      = errors.New("404 Not Found: No se encontraron vehículos con esos criterios.")
 )
