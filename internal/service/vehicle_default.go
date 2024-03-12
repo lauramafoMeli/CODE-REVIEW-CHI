@@ -36,3 +36,9 @@ func (s *VehicleDefault) GetByBrandAndYearRange(brand string, startYear int, fin
 	v, err = s.rp.GetByBrandAndYearRange(brand, startYear, finishYear)
 	return
 }
+
+// GetAverageSpeedByBrand is a method that returns the average speed of vehicles by brand
+func (s *VehicleDefault) GetAverageSpeedByBrand(brand string) (averageSpeed float64, err error) {
+	averageSpeed, err = s.rp.GetAverageSpeedByBrand(brand)
+	return
+}

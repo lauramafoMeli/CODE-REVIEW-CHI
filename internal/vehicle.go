@@ -53,7 +53,8 @@ var (
 	MesgVehicleCreated = "201 Created: Vehículo creado exitosamente."
 
 	// errors
-	ErrVehicleAlreadyExists = errors.New("409 Conflict: Identificador del vehículo ya existente.")
-	ErrFieldsMissing        = errors.New("400 Bad Request: Datos del vehículo mal formados o incompletos.")
-	ErrVehicleNotFound      = errors.New("404 Not Found: No se encontraron vehículos con esos criterios.")
+	ErrVehicleAlreadyExists   = errors.New("409 Conflict: Identificador del vehículo ya existente.")
+	ErrFieldsMissing          = errors.New("400 Bad Request: Datos del vehículo mal formados o incompletos.")
+	ErrVehicleNotFound        = errors.New("404 Not Found: No se encontraron vehículos con esos criterios.")
+	ErrVehicleNotFoundByBrand = errors.New("404 Not Found: No se encontraron vehículos de esa marca.")
 )

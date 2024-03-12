@@ -276,3 +276,28 @@ func (h *VehicleDefault) GetByBrandAndYearRange() http.HandlerFunc {
 		})
 	}
 }
+
+// GetAverageSpeedByBrand is a method that returns a map of vehicles for the route GET /vehicles/average-speed/brand/{brand}
+func (h *VehicleDefault) GetAverageSpeedByBrand() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// -request
+		// - get brand from url
+		brand := chi.URLParam(r, "brand")
+
+		// process
+		// - get average speed by brand
+		v, err := h.sv.GetAverageSpeedByBrand(brand)
+		if err != nil {
+			response.JSON(w, http.StatusNotFound, map[string]any{
+				"message": err.Error(),
+			})
+			return
+		}
+
+		// response
+		response.JSON(w, http.StatusOK, map[string]any{
+			"message": "success",
+			"data":    v,
+		})
+	}
+}

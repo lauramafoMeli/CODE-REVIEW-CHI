@@ -10,4 +10,6 @@ type VehicleService interface {
 	GetByColorAndYear(color string, year int) (v map[int]Vehicle, err error)
 	// GetByBrandAndYearRange is a method that returns a map of vehicles by brand and year range
 	GetByBrandAndYearRange(brand string, startYear int, finishYear int) (v map[int]Vehicle, err error)
+	// GetAverageSpeedByBrand is a method that returns the average speed of vehicles by brand
+	GetAverageSpeedByBrand(brand string) (averageSpeed float64, err error)
 }

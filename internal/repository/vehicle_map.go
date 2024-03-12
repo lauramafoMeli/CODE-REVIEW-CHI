@@ -81,3 +81,24 @@ func (r *VehicleMap) GetByBrandAndYearRange(brand string, startYear int, finishY
 
 	return
 }
+
+// GetAverageSpeedByBrand is a method that returns the average speed of vehicles by brand
+func (r *VehicleMap) GetAverageSpeedByBrand(brand string) (averageSpeed float64, err error) {
+	averageSpeed = 0.0
+	count := 0
+
+	for _, value := range r.db {
+		if value.Brand == brand {
+			averageSpeed += value.MaxSpeed
+			count++
+		}
+	}
+
+	if count == 0 {
+		err = internal.ErrVehicleNotFoundByBrand
+	}
+
+	averageSpeed /= float64(count)
+	return
+
+}
