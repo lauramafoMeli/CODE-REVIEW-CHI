@@ -178,7 +178,7 @@ func (h *VehicleDefault) GetByColorAndYear() http.HandlerFunc {
 		// - get vehicles by color and year
 		v, err := h.sv.GetByColorAndYear(color, year)
 		if err != nil {
-			response.JSON(w, http.StatusInternalServerError, map[string]any{
+			response.JSON(w, http.StatusNotFound, map[string]any{
 				"message": err.Error(),
 			})
 			return
@@ -209,5 +209,70 @@ func (h *VehicleDefault) GetByColorAndYear() http.HandlerFunc {
 			"data":    data,
 		})
 
+	}
+}
+
+// GetByBrandAndYearRange is a method that returns a map of vehicles for the route GET /vehicles/brand/{brand}/between/{start_year}/{end_year}
+func (h *VehicleDefault) GetByBrandAndYearRange() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// request
+		// - get brand and year range from url
+		brand := chi.URLParam(r, "brand")
+		yearStart, err := strconv.Atoi(chi.URLParam(r, "start_year"))
+		if err != nil {
+			response.JSON(w, http.StatusBadRequest, map[string]any{
+				"message": err.Error(),
+			})
+			return
+		}
+		yearEnd, err := strconv.Atoi(chi.URLParam(r, "end_year"))
+		if err != nil {
+			response.JSON(w, http.StatusBadRequest, map[string]any{
+				"message": err.Error(),
+			})
+			return
+		}
+		// validate year range
+		if yearStart > yearEnd {
+			response.JSON(w, http.StatusBadRequest, map[string]any{
+				"message": "400 Bad Request: year range is invalid",
+			})
+			return
+		}
+
+		// process
+		// - get vehicles by brand and year range
+		v, err := h.sv.GetByBrandAndYearRange(brand, yearStart, yearEnd)
+		if err != nil {
+			response.JSON(w, http.StatusNotFound, map[string]any{
+				"message": err.Error(),
+			})
+			return
+		}
+
+		// response
+		data := make(map[int]VehicleJSON)
+		for key, value := range v {
+			data[key] = VehicleJSON{
+				ID:              value.Id,
+				Brand:           value.Brand,
+				Model:           value.Model,
+				Registration:    value.Registration,
+				Color:           value.Color,
+				FabricationYear: value.FabricationYear,
+				Capacity:        value.Capacity,
+				MaxSpeed:        value.MaxSpeed,
+				FuelType:        value.FuelType,
+				Transmission:    value.Transmission,
+				Weight:          value.Weight,
+				Height:          value.Height,
+				Length:          value.Length,
+				Width:           value.Width,
+			}
+		}
+		response.JSON(w, http.StatusOK, map[string]any{
+			"message": "success",
+			"data":    data,
+		})
 	}
 }

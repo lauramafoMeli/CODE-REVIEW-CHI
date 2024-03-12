@@ -8,4 +8,6 @@ type VehicleService interface {
 	Create(v Vehicle) (err error)
 	// GetByColorAndYear is a method that returns a map of vehicles by color and year
 	GetByColorAndYear(color string, year int) (v map[int]Vehicle, err error)
+	// GetByBrandAndYearRange is a method that returns a map of vehicles by brand and year range
+	GetByBrandAndYearRange(brand string, startYear int, finishYear int) (v map[int]Vehicle, err error)
 }
