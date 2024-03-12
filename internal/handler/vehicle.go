@@ -2,6 +2,10 @@ package handler
 
 import (
 	"app/internal"
+	"app/platform/tools"
+	"encoding/json"
+	"errors"
+	"io"
 	"net/http"
 
 	"github.com/bootcamp-go/web/response"
@@ -73,6 +77,83 @@ func (h *VehicleDefault) GetAll() http.HandlerFunc {
 		response.JSON(w, http.StatusOK, map[string]any{
 			"message": "success",
 			"data":    data,
+		})
+	}
+}
+
+// Create is a method that returns a handler for the route POST /vehicles
+func (h *VehicleDefault) Create() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// request
+		// - read body to bytes
+		body, err := io.ReadAll(r.Body)
+		if err != nil {
+			response.JSON(w, http.StatusBadRequest, nil)
+			return
+		}
+		// - unmarshal body to array string any for validations
+		bodyMap := map[string]any{}
+		err = json.Unmarshal(body, &bodyMap)
+		if err != nil {
+			response.JSON(w, http.StatusBadRequest, nil)
+			return
+		}
+
+		// process
+		// - validate body
+		if err = tools.ValidateField(bodyMap, "brand", "model", "registration", "color", "year", "passengers", "max_speed", "fuel_type", "transmission", "weight", "height", "length", "width"); err != nil {
+			var fieldError *tools.FieldError
+			if errors.As(err, &fieldError) {
+				response.JSON(w, http.StatusBadRequest, map[string]any{
+					"message": errors.Join(internal.ErrFieldsMissing, errors.New(fieldError.Error())).Error(),
+				})
+				return
+			}
+			response.JSON(w, http.StatusBadRequest, map[string]any{
+				"message": "internal error",
+			})
+			return
+		}
+		// - unmarshal body to vehicle
+		var vehicle VehicleJSON
+		err = json.Unmarshal(body, &vehicle)
+		if err != nil {
+			response.JSON(w, http.StatusBadRequest, map[string]any{
+				"message": internal.ErrFieldsMissing.Error(),
+			})
+			return
+		}
+		// - create vehicle
+		err = h.sv.Create(internal.Vehicle{
+			Id: vehicle.ID,
+			VehicleAttributes: internal.VehicleAttributes{
+				Brand:           vehicle.Brand,
+				Model:           vehicle.Model,
+				Registration:    vehicle.Registration,
+				Color:           vehicle.Color,
+				FabricationYear: vehicle.FabricationYear,
+				Capacity:        vehicle.Capacity,
+				MaxSpeed:        vehicle.MaxSpeed,
+				FuelType:        vehicle.FuelType,
+				Transmission:    vehicle.Transmission,
+				Weight:          vehicle.Weight,
+				Dimensions: internal.Dimensions{
+					Height: vehicle.Height,
+					Length: vehicle.Length,
+					Width:  vehicle.Width,
+				},
+			},
+		})
+		if err != nil {
+			response.JSON(w, http.StatusConflict, map[string]any{
+				"message": err.Error(),
+			})
+			return
+		}
+
+		// response
+		response.JSON(w, http.StatusCreated, map[string]any{
+			"message": internal.MesgVehicleCreated,
 		})
 	}
 }

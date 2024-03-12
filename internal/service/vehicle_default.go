@@ -18,3 +18,9 @@ func (s *VehicleDefault) FindAll() (v map[int]internal.Vehicle, err error) {
 	v, err = s.rp.FindAll()
 	return
 }
+
+// Create is a method that creates a vehicle
+func (s *VehicleDefault) Create(v internal.Vehicle) (err error) {
+	err = s.rp.Create(v)
+	return
+}

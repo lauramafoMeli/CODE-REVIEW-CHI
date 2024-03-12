@@ -1,5 +1,7 @@
 package internal
 
+import "errors"
+
 // Dimensions is a struct that represents a dimension in 3d
 type Dimensions struct {
 	// Height is the height of the dimension
@@ -44,3 +46,13 @@ type Vehicle struct {
 	// VehicleAttribue is the attributes of a vehicle
 	VehicleAttributes
 }
+
+// Var for different types of errors and messages
+var (
+	//messages
+	MesgVehicleCreated = "201 Created: Vehículo creado exitosamente."
+
+	// errors
+	ErrVehicleAlreadyExists = errors.New("409 Conflict: Identificador del vehículo ya existente.")
+	ErrFieldsMissing        = errors.New("400 Bad Request: Datos del vehículo mal formados o incompletos.")
+)
