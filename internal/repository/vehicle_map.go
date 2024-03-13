@@ -51,15 +51,13 @@ func (r *VehicleMap) GetByColorAndYear(color string, year int) (v map[int]intern
 	v = make(map[int]internal.Vehicle)
 
 	// copy db
-	index := 0
-	for _, value := range r.db {
+	for index, value := range r.db {
 		if value.Color == color && value.FabricationYear == year {
 			v[index] = value
-			index++
 		}
 	}
 
-	if index == 0 {
+	if len(v) == 0 {
 		err = internal.ErrVehicleNotFound
 	}
 
@@ -71,15 +69,13 @@ func (r *VehicleMap) GetByBrandAndYearRange(brand string, startYear int, finishY
 	v = make(map[int]internal.Vehicle)
 
 	// copy db
-	index := 0
-	for _, value := range r.db {
+	for index, value := range r.db {
 		if value.Brand == brand && value.FabricationYear >= startYear && value.FabricationYear <= finishYear {
 			v[index] = value
-			index++
 		}
 	}
 
-	if index == 0 {
+	if len(v) == 0 {
 		err = internal.ErrVehicleNotFound
 	}
 
@@ -131,16 +127,23 @@ func (r *VehicleMap) CreateMultiple(v []internal.Vehicle) (err error) {
 // UpdateSpeed is a method that updates the speed of a vehicle
 func (r *VehicleMap) UpdateSpeed(id int, speed float64) (err error) {
 	// validate vehicle ID
-	for index, value := range r.db {
-		if value.Id == id {
-			vehicle := value         // Make a copy of the vehicle
-			vehicle.MaxSpeed = speed // Update the speed of the copied vehicle
-			r.db[index] = vehicle    // Assign the updated vehicle back to the map
-			return
-		}
+	//for index, value := range r.db {
+	//if value.Id == id {
+	//vehicle := value         // Make a copy of the vehicle
+	//vehicle.MaxSpeed = speed // Update the speed of the copied vehicle
+	//r.db[index] = vehicle    // Assign the updated vehicle back to the map
+	//return
+	//}
+	//}
+
+	if _, ok := r.db[id]; !ok {
+		err = internal.ErrVehicleNotFound
+		return
 	}
 
-	err = internal.ErrVehicleNotFound
+	vehicle := r.db[id]      // Make a copy of the vehicle
+	vehicle.MaxSpeed = speed // Update the speed of the copied vehicle
+	r.db[id] = vehicle       // Assign the updated vehicle back to the map
 	return
 }
 
@@ -149,15 +152,13 @@ func (r *VehicleMap) GetByFuelType(fuelType string) (v map[int]internal.Vehicle,
 	v = make(map[int]internal.Vehicle)
 
 	// copy db
-	index := 0
-	for _, value := range r.db {
+	for index, value := range r.db {
 		if value.FuelType == fuelType {
 			v[index] = value
-			index++
 		}
 	}
 
-	if index == 0 {
+	if len(v) == 0 {
 		err = internal.ErrVehicleNotFound
 	}
 
