@@ -126,16 +126,6 @@ func (r *VehicleMap) CreateMultiple(v []internal.Vehicle) (err error) {
 
 // UpdateSpeed is a method that updates the speed of a vehicle
 func (r *VehicleMap) UpdateSpeed(id int, speed float64) (err error) {
-	// validate vehicle ID
-	//for index, value := range r.db {
-	//if value.Id == id {
-	//vehicle := value         // Make a copy of the vehicle
-	//vehicle.MaxSpeed = speed // Update the speed of the copied vehicle
-	//r.db[index] = vehicle    // Assign the updated vehicle back to the map
-	//return
-	//}
-	//}
-
 	if _, ok := r.db[id]; !ok {
 		err = internal.ErrVehicleNotFound
 		return
@@ -160,6 +150,35 @@ func (r *VehicleMap) GetByFuelType(fuelType string) (v map[int]internal.Vehicle,
 
 	if len(v) == 0 {
 		err = internal.ErrVehicleNotFound
+	}
+
+	return
+}
+
+// Delete is a method that deletes a vehicle
+func (r *VehicleMap) Delete(id int) (err error) {
+	if _, ok := r.db[id]; !ok {
+		err = internal.ErrVehicleNotFound
+		return
+	}
+
+	delete(r.db, id)
+	return
+}
+
+// GetByTransmission is a method that returns a map of vehicles by transmission type
+func (r *VehicleMap) GetByTransmission(transmission string) (v map[int]internal.Vehicle, err error) {
+	v = make(map[int]internal.Vehicle)
+
+	// copy db
+	for index, value := range r.db {
+		if value.Transmission == transmission {
+			v[index] = value
+		}
+	}
+
+	if len(v) == 0 {
+		err = internal.ErrVehicleNotFoundByTransmission
 	}
 
 	return

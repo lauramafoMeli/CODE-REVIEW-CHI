@@ -52,10 +52,12 @@ var (
 	//messages
 	MesgVehicleCreated      = "201 Created: Vehículo creado exitosamente."
 	MesgVehicleUpdatedSpeed = "200 OK: Velocidad del vehículo actualizada exitosamente."
+	MesgVehicleDeleted      = "204 No Content: Vehículo eliminado exitosamente."
 
 	// errors
-	ErrVehicleAlreadyExists   = errors.New("409 Conflict: Identificador del vehículo ya existente.")
-	ErrFieldsMissing          = errors.New("400 Bad Request: Datos del vehículo mal formados o incompletos.")
-	ErrVehicleNotFound        = errors.New("404 Not Found: No se encontraron vehículos con esos criterios.")
-	ErrVehicleNotFoundByBrand = errors.New("404 Not Found: No se encontraron vehículos de esa marca.")
+	ErrVehicleAlreadyExists          = errors.New("409 Conflict: Identificador del vehículo ya existente.")
+	ErrFieldsMissing                 = errors.New("400 Bad Request: Datos del vehículo mal formados o incompletos.")
+	ErrVehicleNotFound               = errors.New("404 Not Found: No se encontraron vehículos con esos criterios.")
+	ErrVehicleNotFoundByBrand        = errors.New("404 Not Found: No se encontraron vehículos de esa marca.")
+	ErrVehicleNotFoundByTransmission = errors.New("404 Not Found: No se encontraron vehiculos con ese tipo de transmisión.")
 )

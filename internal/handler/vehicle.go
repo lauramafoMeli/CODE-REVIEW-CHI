@@ -474,7 +474,7 @@ func (h *VehicleDefault) UpdateSpeed() http.HandlerFunc {
 	}
 }
 
-// GetByFuelType is a method that returns a handler for the route GET /vehicles/fuel_type/{fuel_type}
+// GetByFuelType is a method that returns a handler for the route GET /vehicles/fuel_type/{type}
 func (h *VehicleDefault) GetByFuelType() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// request
@@ -484,6 +484,61 @@ func (h *VehicleDefault) GetByFuelType() http.HandlerFunc {
 		// process
 		// - get vehicles by fuel type
 		vehicles, err := h.sv.GetByFuelType(fuelType)
+		if err != nil {
+			response.JSON(w, http.StatusNotFound, map[string]any{
+				"message": err.Error(),
+			})
+			return
+		}
+
+		// response
+		response.JSON(w, http.StatusOK, map[string]any{
+			"message": "success",
+			"data":    vehicles,
+		})
+	}
+}
+
+// Delete is a method that returns a handler for the route DELETE /vehicles/{id}
+func (h *VehicleDefault) Delete() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// request
+		// - get id from url
+		id, err := strconv.Atoi(chi.URLParam(r, "id"))
+		if err != nil {
+			response.JSON(w, http.StatusBadRequest, map[string]any{
+				"message": err.Error(),
+			})
+			return
+		}
+
+		// process
+		// - delete vehicle
+		err = h.sv.Delete(id)
+		if err != nil {
+			response.JSON(w, http.StatusNotFound, map[string]any{
+				"message": err.Error(),
+			})
+			return
+		}
+
+		// response
+		response.JSON(w, http.StatusOK, map[string]any{
+			"message": internal.MesgVehicleDeleted,
+		})
+	}
+}
+
+// GetByTransmission is a method that returns a handler for the route GET /vehicles/transmission/{type}
+func (h *VehicleDefault) GetByTransmission() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// request
+		// - get transmission type from url
+		transmission := chi.URLParam(r, "type")
+
+		// process
+		// - get vehicles by transmission
+		vehicles, err := h.sv.GetByTransmission(transmission)
 		if err != nil {
 			response.JSON(w, http.StatusNotFound, map[string]any{
 				"message": err.Error(),

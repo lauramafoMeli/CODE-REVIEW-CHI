@@ -84,9 +84,12 @@ func (a *ServerChi) Run() (err error) {
 		rt.Post("/batch", hd.CreateMultiple())
 		// - PATCH /vehicles/{id}/update_speed
 		rt.Patch("/{id}/update_speed", hd.UpdateSpeed())
-		// GET /vehicles/fuel_type/{type}
+		// - GET /vehicles/fuel_type/{type}
 		rt.Get("/fuel_type/{type}", hd.GetByFuelType())
-
+		// DELETE /vehicles/{id}
+		rt.Delete("/{id}", hd.Delete())
+		// - GET /vehicles/transmission/{type}
+		rt.Get("/transmission/{type}", hd.GetByTransmission())
 	})
 
 	// run server
