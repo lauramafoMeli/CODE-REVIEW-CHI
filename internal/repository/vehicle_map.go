@@ -143,3 +143,23 @@ func (r *VehicleMap) UpdateSpeed(id int, speed float64) (err error) {
 	err = internal.ErrVehicleNotFound
 	return
 }
+
+// GetByFuelType is a method that returns a map of vehicles by fuel type
+func (r *VehicleMap) GetByFuelType(fuelType string) (v map[int]internal.Vehicle, err error) {
+	v = make(map[int]internal.Vehicle)
+
+	// copy db
+	index := 0
+	for _, value := range r.db {
+		if value.FuelType == fuelType {
+			v[index] = value
+			index++
+		}
+	}
+
+	if index == 0 {
+		err = internal.ErrVehicleNotFound
+	}
+
+	return
+}

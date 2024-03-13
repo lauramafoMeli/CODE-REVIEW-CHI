@@ -16,4 +16,6 @@ type VehicleService interface {
 	CreateMultiple(v []Vehicle) (err error)
 	// UpdateSpeed is a method that updates the speed of a vehicle
 	UpdateSpeed(id int, speed float64) (err error)
+	// GetByFuelType is a method that returns a map of vehicles by fuel type
+	GetByFuelType(fuelType string) (v map[int]Vehicle, err error)
 }

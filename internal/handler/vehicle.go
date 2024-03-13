@@ -404,7 +404,7 @@ func (h *VehicleDefault) CreateMultiple() http.HandlerFunc {
 
 }
 
-// Update speed is a method that returns a handler for the route PATCH /vehicles/{id}/update_speed
+// UpdateSpeed is a method that returns a handler for the route PATCH /vehicles/{id}/update_speed
 func (h *VehicleDefault) UpdateSpeed() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// request
@@ -470,6 +470,31 @@ func (h *VehicleDefault) UpdateSpeed() http.HandlerFunc {
 		// response
 		response.JSON(w, http.StatusOK, map[string]any{
 			"message": internal.MesgVehicleUpdatedSpeed,
+		})
+	}
+}
+
+// GetByFuelType is a method that returns a handler for the route GET /vehicles/fuel_type/{fuel_type}
+func (h *VehicleDefault) GetByFuelType() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// request
+		// - get fuel type from url
+		fuelType := chi.URLParam(r, "type")
+
+		// process
+		// - get vehicles by fuel type
+		vehicles, err := h.sv.GetByFuelType(fuelType)
+		if err != nil {
+			response.JSON(w, http.StatusNotFound, map[string]any{
+				"message": err.Error(),
+			})
+			return
+		}
+
+		// response
+		response.JSON(w, http.StatusOK, map[string]any{
+			"message": "success",
+			"data":    vehicles,
 		})
 	}
 }
