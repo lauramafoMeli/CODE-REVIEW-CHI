@@ -31,6 +31,10 @@ type VehicleJSON struct {
 	Width           float64 `json:"width"`
 }
 
+type MultipleVehicleJSON struct {
+	Vehicles []VehicleJSON `json:"vehicles"`
+}
+
 // NewVehicleDefault is a function that returns a new instance of VehicleDefault
 func NewVehicleDefault(sv internal.VehicleService) *VehicleDefault {
 	return &VehicleDefault{sv: sv}
@@ -280,7 +284,7 @@ func (h *VehicleDefault) GetByBrandAndYearRange() http.HandlerFunc {
 // GetAverageSpeedByBrand is a method that returns a map of vehicles for the route GET /vehicles/average-speed/brand/{brand}
 func (h *VehicleDefault) GetAverageSpeedByBrand() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		// -request
+		// request
 		// - get brand from url
 		brand := chi.URLParam(r, "brand")
 
@@ -300,4 +304,102 @@ func (h *VehicleDefault) GetAverageSpeedByBrand() http.HandlerFunc {
 			"data":    v,
 		})
 	}
+}
+
+// CreateMultiple is a method that returns a handler for the route POST /vehicles/batch
+func (h *VehicleDefault) CreateMultiple() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// request
+		// - get body
+		body, err := io.ReadAll(r.Body)
+		if err != nil {
+			response.JSON(w, http.StatusBadRequest, map[string]any{
+				"message": err.Error(),
+			})
+			return
+		}
+
+		// - unmarshal body to vehicles map
+		var vehicles map[string](map[string]any)
+		err = json.Unmarshal(body, &vehicles)
+		if err != nil {
+			response.JSON(w, http.StatusBadRequest, map[string]any{
+				"message": err.Error(),
+			})
+			return
+		}
+
+		// process
+		// - VehicleJSON to map[string]any
+		for _, value := range vehicles {
+			// - validate vehicles map
+			if err = tools.ValidateField(value, "brand", "model", "registration", "color", "year", "passengers", "max_speed", "fuel_type", "transmission", "weight", "height", "length", "width"); err != nil {
+				var fieldError *tools.FieldError
+				if errors.As(err, &fieldError) {
+					response.JSON(w, http.StatusBadRequest, map[string]any{
+						"message": errors.Join(internal.ErrFieldsMissing, errors.New(fieldError.Error())).Error(),
+					})
+					return
+				}
+				response.JSON(w, http.StatusBadRequest, map[string]any{
+					"message": "internal error",
+				})
+				return
+			}
+		}
+
+		// - create vehicles slice
+		var vehiclesSend []internal.Vehicle
+		var vehicle internal.Vehicle
+		for _, value := range vehicles {
+			jsonData, err := json.Marshal(value)
+			if err != nil {
+				response.JSON(w, http.StatusBadRequest, map[string]any{
+					"message": err.Error(),
+				})
+				return
+			}
+			err = json.Unmarshal(jsonData, &vehicle)
+			if err != nil {
+				response.JSON(w, http.StatusBadRequest, map[string]any{
+					"message": err.Error(),
+				})
+				return
+			}
+			vehiclesSend = append(vehiclesSend, internal.Vehicle{
+				Id: vehicle.Id,
+				VehicleAttributes: internal.VehicleAttributes{
+					Brand:           vehicle.Brand,
+					Model:           vehicle.Model,
+					Registration:    vehicle.Registration,
+					Color:           vehicle.Color,
+					FabricationYear: vehicle.FabricationYear,
+					Capacity:        vehicle.Capacity,
+					MaxSpeed:        vehicle.MaxSpeed,
+					FuelType:        vehicle.FuelType,
+					Transmission:    vehicle.Transmission,
+					Weight:          vehicle.Weight,
+					Dimensions: internal.Dimensions{
+						Height: vehicle.Height,
+						Length: vehicle.Length,
+						Width:  vehicle.Width,
+					},
+				},
+			})
+		}
+
+		err = h.sv.CreateMultiple(vehiclesSend)
+		if err != nil {
+			response.JSON(w, http.StatusBadRequest, map[string]any{
+				"message": err.Error(),
+			})
+			return
+		}
+
+		// response
+		response.JSON(w, http.StatusCreated, map[string]any{
+			"message": internal.MesgVehicleCreated,
+		})
+	}
+
 }

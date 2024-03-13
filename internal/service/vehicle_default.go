@@ -42,3 +42,9 @@ func (s *VehicleDefault) GetAverageSpeedByBrand(brand string) (averageSpeed floa
 	averageSpeed, err = s.rp.GetAverageSpeedByBrand(brand)
 	return
 }
+
+// CreateMultiple is a method that creates multiple vehicles
+func (s *VehicleDefault) CreateMultiple(v []internal.Vehicle) (err error) {
+	err = s.rp.CreateMultiple(v)
+	return
+}

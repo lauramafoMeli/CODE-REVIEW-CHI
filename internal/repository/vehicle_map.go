@@ -1,6 +1,8 @@
 package repository
 
-import "app/internal"
+import (
+	"app/internal"
+)
 
 // NewVehicleMap is a function that returns a new instance of VehicleMap
 func NewVehicleMap(db map[int]internal.Vehicle) *VehicleMap {
@@ -33,9 +35,11 @@ func (r *VehicleMap) FindAll() (v map[int]internal.Vehicle, err error) {
 // Create is a method that creates a vehicle
 func (r *VehicleMap) Create(v internal.Vehicle) (err error) {
 	// validate vehicle ID
-	if _, ok := r.db[v.Id]; ok {
-		err = internal.ErrVehicleAlreadyExists
-		return
+	for _, value := range r.db {
+		if value.Id == v.Id {
+			err = internal.ErrVehicleAlreadyExists
+			return
+		}
 	}
 	// add vehicle to db
 	r.db[v.Id] = v
@@ -101,4 +105,25 @@ func (r *VehicleMap) GetAverageSpeedByBrand(brand string) (averageSpeed float64,
 	averageSpeed /= float64(count)
 	return
 
+}
+
+// CreateMultiple is a method that creates multiple vehicles
+func (r *VehicleMap) CreateMultiple(v []internal.Vehicle) (err error) {
+	// Validate vehicles ID
+	for _, vehicle := range v {
+		for _, value := range r.db {
+			if value.Id == vehicle.Id {
+				err = internal.ErrVehicleAlreadyExists
+				return
+			}
+		}
+
+	}
+
+	// Add vehicles to db
+	for _, vehicle := range v {
+		r.db[vehicle.Id] = vehicle
+	}
+
+	return
 }

@@ -12,4 +12,6 @@ type VehicleService interface {
 	GetByBrandAndYearRange(brand string, startYear int, finishYear int) (v map[int]Vehicle, err error)
 	// GetAverageSpeedByBrand is a method that returns the average speed of vehicles by brand
 	GetAverageSpeedByBrand(brand string) (averageSpeed float64, err error)
+	// CreateMultiple is a method that creates multiple vehicles
+	CreateMultiple(v []Vehicle) (err error)
 }

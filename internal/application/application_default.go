@@ -80,6 +80,8 @@ func (a *ServerChi) Run() (err error) {
 		rt.Get("/brand/{brand}/between/{start_year}/{end_year}", hd.GetByBrandAndYearRange())
 		// - GET /vehicles/average_speed/brand/{brand}
 		rt.Get("/average_speed/brand/{brand}", hd.GetAverageSpeedByBrand())
+		// - POST /vehicles/batch
+		rt.Post("/batch", hd.CreateMultiple())
 	})
 
 	// run server
