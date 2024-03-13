@@ -403,3 +403,73 @@ func (h *VehicleDefault) CreateMultiple() http.HandlerFunc {
 	}
 
 }
+
+// Update speed is a method that returns a handler for the route PATCH /vehicles/{id}/update_speed
+func (h *VehicleDefault) UpdateSpeed() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// request
+		// - get id from url
+		id, err := strconv.Atoi(chi.URLParam(r, "id"))
+		if err != nil {
+			response.JSON(w, http.StatusBadRequest, map[string]any{
+				"message": err.Error(),
+			})
+			return
+		}
+
+		// - get body
+		body, err := io.ReadAll(r.Body)
+		if err != nil {
+			response.JSON(w, http.StatusBadRequest, map[string]any{
+				"message": err.Error(),
+			})
+			return
+		}
+
+		// - unmarshal body to speed map
+		var speed map[string]any
+		err = json.Unmarshal(body, &speed)
+		if err != nil {
+			response.JSON(w, http.StatusBadRequest, map[string]any{
+				"message": err.Error(),
+			})
+			return
+		}
+
+		// process
+		// - validate speed map
+		if err = tools.ValidateField(speed, "speed"); err != nil {
+			var fieldError *tools.FieldError
+			if errors.As(err, &fieldError) {
+				response.JSON(w, http.StatusBadRequest, map[string]any{
+					"message": errors.Join(internal.ErrFieldsMissing, errors.New(fieldError.Error())).Error(),
+				})
+				return
+			}
+			response.JSON(w, http.StatusBadRequest, map[string]any{
+				"message": "internal error",
+			})
+			return
+		}
+		// - update speed
+		speedValue := speed["speed"].(float64)
+		if speedValue < 0 {
+			response.JSON(w, http.StatusBadRequest, map[string]any{
+				"message": "400 Bad Request: Velocidad mal formada o fuera de rango.",
+			})
+			return
+		}
+		err = h.sv.UpdateSpeed(id, speedValue)
+		if err != nil {
+			response.JSON(w, http.StatusNotFound, map[string]any{
+				"message": err.Error(),
+			})
+			return
+		}
+
+		// response
+		response.JSON(w, http.StatusOK, map[string]any{
+			"message": internal.MesgVehicleUpdatedSpeed,
+		})
+	}
+}

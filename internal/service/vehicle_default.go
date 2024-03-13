@@ -48,3 +48,9 @@ func (s *VehicleDefault) CreateMultiple(v []internal.Vehicle) (err error) {
 	err = s.rp.CreateMultiple(v)
 	return
 }
+
+// UpdateSpeed is a method that updates the speed of a vehicle
+func (s *VehicleDefault) UpdateSpeed(id int, speed float64) (err error) {
+	err = s.rp.UpdateSpeed(id, speed)
+	return
+}

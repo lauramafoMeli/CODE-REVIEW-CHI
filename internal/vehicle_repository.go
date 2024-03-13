@@ -14,4 +14,6 @@ type VehicleRepository interface {
 	GetAverageSpeedByBrand(brand string) (averageSpeed float64, err error)
 	// CreateMultiple is a method that creates multiple vehicles
 	CreateMultiple(v []Vehicle) (err error)
+	// UpdateSpeed is a method that updates the speed of a vehicle
+	UpdateSpeed(id int, speed float64) (err error)
 }

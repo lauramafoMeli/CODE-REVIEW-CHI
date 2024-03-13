@@ -50,7 +50,8 @@ type Vehicle struct {
 // Var for different types of errors and messages
 var (
 	//messages
-	MesgVehicleCreated = "201 Created: Vehículo creado exitosamente."
+	MesgVehicleCreated      = "201 Created: Vehículo creado exitosamente."
+	MesgVehicleUpdatedSpeed = "200 OK: Velocidad del vehículo actualizada exitosamente."
 
 	// errors
 	ErrVehicleAlreadyExists   = errors.New("409 Conflict: Identificador del vehículo ya existente.")
