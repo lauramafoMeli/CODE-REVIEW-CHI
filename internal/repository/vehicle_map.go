@@ -101,7 +101,6 @@ func (r *VehicleMap) GetAverageSpeedByBrand(brand string) (averageSpeed float64,
 
 	averageSpeed /= float64(count)
 	return
-
 }
 
 // CreateMultiple is a method that creates multiple vehicles
@@ -259,6 +258,10 @@ func (r *VehicleMap) GetByDimensions(dimensions map[string]float64) (v map[int]i
 		}
 	}
 
+	if len(v) == 0 {
+		err = internal.ErrVehicleNotFoundByDimensions
+	}
+
 	return
 }
 
@@ -292,6 +295,10 @@ func (r *VehicleMap) GetByWeight(weight map[string]float64) (v map[int]internal.
 				v[index] = value
 			}
 		}
+	}
+
+	if len(v) == 0 {
+		err = internal.ErrVehicleNotFoundByWeight
 	}
 
 	return
