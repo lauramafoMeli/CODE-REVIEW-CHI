@@ -459,7 +459,11 @@ func (h *VehicleDefault) UpdateSpeed() http.HandlerFunc {
 			})
 			return
 		}
-		err = h.sv.UpdateSpeed(id, speedValue)
+
+		speed = map[string]any{
+			"speed": speedValue,
+		}
+		err = h.sv.Update(id, speed)
 		if err != nil {
 			response.JSON(w, http.StatusNotFound, map[string]any{
 				"message": err.Error(),
@@ -550,6 +554,97 @@ func (h *VehicleDefault) GetByTransmission() http.HandlerFunc {
 		response.JSON(w, http.StatusOK, map[string]any{
 			"message": "success",
 			"data":    vehicles,
+		})
+	}
+}
+
+// UpdateFuel is a method that returns a handler for the route PATCH /vehicles/{id}/update_fuel
+func (h *VehicleDefault) UpdateFuel() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// request
+		// - get id from url
+		id, err := strconv.Atoi(chi.URLParam(r, "id"))
+		if err != nil {
+			response.JSON(w, http.StatusBadRequest, map[string]any{
+				"message": err.Error(),
+			})
+			return
+		}
+
+		// - get body
+		body, err := io.ReadAll(r.Body)
+		if err != nil {
+			response.JSON(w, http.StatusBadRequest, map[string]any{
+				"message": err.Error(),
+			})
+			return
+		}
+
+		// - unmarshal body to fuel map
+		var fuel map[string]any
+		err = json.Unmarshal(body, &fuel)
+		if err != nil {
+			response.JSON(w, http.StatusBadRequest, map[string]any{
+				"message": err.Error(),
+			})
+			return
+		}
+
+		// process
+		// - validate fuel map
+		if err = tools.ValidateField(fuel, "fuel_type"); err != nil {
+			var fieldError *tools.FieldError
+			if errors.As(err, &fieldError) {
+				response.JSON(w, http.StatusBadRequest, map[string]any{
+					"message": errors.Join(internal.ErrFieldsMissing, errors.New(fieldError.Error())).Error(),
+				})
+				return
+			}
+			response.JSON(w, http.StatusBadRequest, map[string]any{
+				"message": "internal error",
+			})
+			return
+		}
+		// - update fuel
+		fuel = map[string]any{
+			"fuel_type": fuel["fuel_type"],
+		}
+		err = h.sv.Update(id, fuel)
+		if err != nil {
+			response.JSON(w, http.StatusNotFound, map[string]any{
+				"message": err.Error(),
+			})
+			return
+		}
+
+		// response
+		response.JSON(w, http.StatusOK, map[string]any{
+			"message": internal.MesgVehicleUpdateFuel,
+		})
+	}
+}
+
+// GetAverageCapacityByBrand is a method that returns a handler for the route GET /vehicles/average_capacity/{brand}
+func (h *VehicleDefault) GetAverageCapacityByBrand() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// request
+		// - get brand from url
+		brand := chi.URLParam(r, "brand")
+
+		// process
+		// - get average capacity by brand
+		average, err := h.sv.GetAverageCapacityByBrand(brand)
+		if err != nil {
+			response.JSON(w, http.StatusNotFound, map[string]any{
+				"message": err.Error(),
+			})
+			return
+		}
+
+		// response
+		response.JSON(w, http.StatusOK, map[string]any{
+			"message": "success",
+			"data":    average,
 		})
 	}
 }

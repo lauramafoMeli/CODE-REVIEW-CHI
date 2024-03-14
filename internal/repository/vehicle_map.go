@@ -125,15 +125,37 @@ func (r *VehicleMap) CreateMultiple(v []internal.Vehicle) (err error) {
 }
 
 // UpdateSpeed is a method that updates the speed of a vehicle
-func (r *VehicleMap) UpdateSpeed(id int, speed float64) (err error) {
-	if _, ok := r.db[id]; !ok {
+func (r *VehicleMap) Update(id int, fields map[string]any) (err error) {
+	vehicle, ok := r.db[id]
+	if !ok {
 		err = internal.ErrVehicleNotFound
 		return
 	}
 
-	vehicle := r.db[id]      // Make a copy of the vehicle
-	vehicle.MaxSpeed = speed // Update the speed of the copied vehicle
+	/*vehicle.MaxSpeed = speed // Update the speed of the copied vehicle
 	r.db[id] = vehicle       // Assign the updated vehicle back to the map
+	return*/
+
+	for key, value := range fields {
+		switch key {
+		case "speed":
+			vehicle.MaxSpeed, ok = value.(float64)
+			if !ok {
+				err = internal.ErrFieldsMissing
+				return
+			}
+		case "fuel_type":
+			vehicle.FuelType, ok = value.(string)
+			if !ok {
+				err = internal.ErrFieldsMissing
+				return
+			}
+		default:
+			err = internal.ErrFieldsMissing
+			return
+		}
+	}
+	r.db[id] = vehicle
 	return
 }
 
@@ -181,5 +203,25 @@ func (r *VehicleMap) GetByTransmission(transmission string) (v map[int]internal.
 		err = internal.ErrVehicleNotFoundByTransmission
 	}
 
+	return
+}
+
+// GetAverageCapacityByBrand is a method that returns the average capacity of vehicles by brand
+func (r *VehicleMap) GetAverageCapacityByBrand(brand string) (averageCapacity float64, err error) {
+	averageCapacity = 0.0
+	count := 0
+
+	for _, value := range r.db {
+		if value.Brand == brand {
+			averageCapacity += float64(value.Capacity)
+			count++
+		}
+	}
+
+	if count == 0 {
+		err = internal.ErrVehicleNotFoundByBrand
+	}
+
+	averageCapacity /= float64(count)
 	return
 }

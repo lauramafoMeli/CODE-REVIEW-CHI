@@ -53,6 +53,7 @@ var (
 	MesgVehicleCreated      = "201 Created: Vehículo creado exitosamente."
 	MesgVehicleUpdatedSpeed = "200 OK: Velocidad del vehículo actualizada exitosamente."
 	MesgVehicleDeleted      = "204 No Content: Vehículo eliminado exitosamente."
+	MesgVehicleUpdateFuel   = "200 OK: Tipo de combustible del vehículo actualizado exitosamente."
 
 	// errors
 	ErrVehicleAlreadyExists          = errors.New("409 Conflict: Identificador del vehículo ya existente.")

@@ -50,8 +50,8 @@ func (s *VehicleDefault) CreateMultiple(v []internal.Vehicle) (err error) {
 }
 
 // UpdateSpeed is a method that updates the speed of a vehicle
-func (s *VehicleDefault) UpdateSpeed(id int, speed float64) (err error) {
-	err = s.rp.UpdateSpeed(id, speed)
+func (s *VehicleDefault) Update(id int, fields map[string]any) (err error) {
+	err = s.rp.Update(id, fields)
 	return
 }
 
@@ -70,5 +70,11 @@ func (s *VehicleDefault) Delete(id int) (err error) {
 // GetByTransmission is a method that returns a map of vehicles by transmission type
 func (s *VehicleDefault) GetByTransmission(transmission string) (v map[int]internal.Vehicle, err error) {
 	v, err = s.rp.GetByTransmission(transmission)
+	return
+}
+
+// GetAverageCapacityByBrand is a method that returns the average capacity of vehicles by brand
+func (s *VehicleDefault) GetAverageCapacityByBrand(brand string) (averageCapacity float64, err error) {
+	averageCapacity, err = s.rp.GetAverageCapacityByBrand(brand)
 	return
 }

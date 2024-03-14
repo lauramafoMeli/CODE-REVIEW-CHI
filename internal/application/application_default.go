@@ -90,6 +90,11 @@ func (a *ServerChi) Run() (err error) {
 		rt.Delete("/{id}", hd.Delete())
 		// - GET /vehicles/transmission/{type}
 		rt.Get("/transmission/{type}", hd.GetByTransmission())
+		// - PATCH /vehicles/{id}/update_fuel
+		rt.Patch("/{id}/update_fuel", hd.UpdateFuel())
+		// - GET /vehicles/average_capacity/brand/{brand}
+		rt.Get("/average_capacity/brand/{brand}", hd.GetAverageCapacityByBrand())
+
 	})
 
 	// run server
