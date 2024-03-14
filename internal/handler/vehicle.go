@@ -8,6 +8,7 @@ import (
 	"io"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/bootcamp-go/web/response"
 	"github.com/go-chi/chi/v5"
@@ -645,6 +646,101 @@ func (h *VehicleDefault) GetAverageCapacityByBrand() http.HandlerFunc {
 		response.JSON(w, http.StatusOK, map[string]any{
 			"message": "success",
 			"data":    average,
+		})
+	}
+}
+
+// GetByDimension is a method that returns a handler for the route GET /vehicles/dimensions?length={min_length}-{max_length}&width={min_width}-{max_width}
+func (h *VehicleDefault) GetByDimensions() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// request
+		// - get query params
+		length := r.URL.Query().Get("length")
+		width := r.URL.Query().Get("width")
+
+		dimensions := make(map[string]float64)
+		if length != "" {
+			// - split length and width
+			lengths := strings.Split(length, "-")
+			if len(lengths) != 2 {
+				response.JSON(w, http.StatusBadRequest, map[string]any{
+					"message": errors.Join(internal.ErrFieldsMissing, errors.New("length must have the format length={min_length}-{max_length}")).Error(),
+				})
+				return
+			}
+			minLength, err := strconv.ParseFloat(lengths[0], 64)
+			if err != nil {
+				response.JSON(w, http.StatusBadRequest, map[string]any{
+					"message": errors.Join(internal.ErrFieldsMissing, err).Error(),
+				})
+				return
+			}
+			maxLength, err := strconv.ParseFloat(lengths[1], 64)
+			if err != nil {
+				response.JSON(w, http.StatusBadRequest, map[string]any{
+					"message": errors.Join(internal.ErrFieldsMissing, err).Error(),
+				})
+				return
+			}
+			if minLength > maxLength {
+				response.JSON(w, http.StatusBadRequest, map[string]any{
+					"message": errors.Join(internal.ErrFieldsMissing, errors.New("invalid length, max length have to be greater than min length")).Error(),
+				})
+				return
+			}
+			// - add to dimensions map
+			dimensions["min_length"] = minLength
+			dimensions["max_length"] = maxLength
+		}
+
+		if width != "" {
+			// - split length and width
+			widths := strings.Split(width, "-")
+			if len(widths) != 2 {
+				response.JSON(w, http.StatusBadRequest, map[string]any{
+					"message": errors.Join(internal.ErrFieldsMissing, errors.New("width must have the format width={min_width}-{max_width}")).Error(),
+				})
+				return
+			}
+			minWidth, err := strconv.ParseFloat(widths[0], 64)
+			if err != nil {
+				response.JSON(w, http.StatusBadRequest, map[string]any{
+					"message": errors.Join(internal.ErrFieldsMissing, err).Error(),
+				})
+				return
+			}
+			maxWidth, err := strconv.ParseFloat(widths[1], 64)
+			if err != nil {
+				response.JSON(w, http.StatusBadRequest, map[string]any{
+					"message": errors.Join(internal.ErrFieldsMissing, err).Error(),
+				})
+				return
+			}
+			if minWidth > maxWidth {
+				response.JSON(w, http.StatusBadRequest, map[string]any{
+					"message": errors.Join(internal.ErrFieldsMissing, errors.New("invalid width, max width have to be greater than min width")).Error(),
+				})
+				return
+			}
+			// - add to dimensions map
+			dimensions["min_width"] = minWidth
+			dimensions["max_width"] = maxWidth
+		}
+
+		// process
+		// - get vehicles by dimension
+		vehicles, err := h.sv.GetByDimensions(dimensions)
+		if err != nil {
+			response.JSON(w, http.StatusNotFound, map[string]any{
+				"message": err.Error(),
+			})
+			return
+		}
+
+		// response
+		response.JSON(w, http.StatusOK, map[string]any{
+			"message": "success",
+			"data":    vehicles,
 		})
 	}
 }

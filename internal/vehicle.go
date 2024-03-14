@@ -61,4 +61,5 @@ var (
 	ErrVehicleNotFound               = errors.New("404 Not Found: No se encontraron vehículos con esos criterios.")
 	ErrVehicleNotFoundByBrand        = errors.New("404 Not Found: No se encontraron vehículos de esa marca.")
 	ErrVehicleNotFoundByTransmission = errors.New("404 Not Found: No se encontraron vehiculos con ese tipo de transmisión.")
+	ErrVehicleNotFoundByDimensions   = errors.New("404 Not Found: No se encontraron vehículos con esas dimensiones.")
 )

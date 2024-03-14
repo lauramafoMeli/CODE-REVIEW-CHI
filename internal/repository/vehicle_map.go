@@ -2,6 +2,7 @@ package repository
 
 import (
 	"app/internal"
+	"fmt"
 )
 
 // NewVehicleMap is a function that returns a new instance of VehicleMap
@@ -223,5 +224,40 @@ func (r *VehicleMap) GetAverageCapacityByBrand(brand string) (averageCapacity fl
 	}
 
 	averageCapacity /= float64(count)
+	return
+}
+
+// GetByDimensions is a method that returns a map of vehicles by dimension
+func (r *VehicleMap) GetByDimensions(dimensions map[string]float64) (v map[int]internal.Vehicle, err error) {
+	v = make(map[int]internal.Vehicle)
+
+	// copy db
+	_, ok_max_length := dimensions["max_length"]
+	_, ok_max_width := dimensions["max_width"]
+
+	fmt.Println(dimensions)
+
+	if !ok_max_length && !ok_max_width {
+		v, err = r.FindAll()
+	} else if !ok_max_length {
+		for index, value := range r.db {
+			if value.Width <= dimensions["max_width"] && value.Width >= dimensions["min_width"] {
+				v[index] = value
+			}
+		}
+	} else if !ok_max_width {
+		for index, value := range r.db {
+			if value.Height <= dimensions["max_length"] && value.Height >= dimensions["min_length"] {
+				v[index] = value
+			}
+		}
+	} else {
+		for index, value := range r.db {
+			if value.Height <= dimensions["max_length"] && value.Height >= dimensions["min_length"] && value.Width <= dimensions["max_width"] && value.Width >= dimensions["min_width"] {
+				v[index] = value
+			}
+		}
+	}
+
 	return
 }

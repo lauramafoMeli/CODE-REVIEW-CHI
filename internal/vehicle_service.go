@@ -24,4 +24,6 @@ type VehicleService interface {
 	GetByTransmission(transmission string) (v map[int]Vehicle, err error)
 	// GetAverageCapacityByBrand is a method that returns the average capacity of vehicles by brand
 	GetAverageCapacityByBrand(brand string) (averageCapacity float64, err error)
+	// GetByDimensions is a method that returns a map of vehicles by dimensions
+	GetByDimensions(dimensions map[string]float64) (v map[int]Vehicle, err error)
 }
