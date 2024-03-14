@@ -84,3 +84,9 @@ func (s *VehicleDefault) GetByDimensions(dimensions map[string]float64) (v map[i
 	v, err = s.rp.GetByDimensions(dimensions)
 	return
 }
+
+// GetByWeight is a method that returns a map of vehicles by weight
+func (s *VehicleDefault) GetByWeight(weight map[string]float64) (v map[int]internal.Vehicle, err error) {
+	v, err = s.rp.GetByWeight(weight)
+	return
+}

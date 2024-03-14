@@ -261,3 +261,38 @@ func (r *VehicleMap) GetByDimensions(dimensions map[string]float64) (v map[int]i
 
 	return
 }
+
+// GetByWeight is a method that returns a map of vehicles by weight
+func (r *VehicleMap) GetByWeight(weight map[string]float64) (v map[int]internal.Vehicle, err error) {
+	v = make(map[int]internal.Vehicle)
+
+	fmt.Println(weight)
+
+	// copy db
+	_, ok_max_weight := weight["max"]
+	_, ok_min_weight := weight["min"]
+
+	if !ok_max_weight && !ok_min_weight {
+		v, err = r.FindAll()
+	} else if !ok_max_weight {
+		for index, value := range r.db {
+			if value.Weight >= weight["min"] {
+				v[index] = value
+			}
+		}
+	} else if !ok_min_weight {
+		for index, value := range r.db {
+			if value.Weight <= weight["max"] {
+				v[index] = value
+			}
+		}
+	} else {
+		for index, value := range r.db {
+			if value.Weight <= weight["max"] && value.Weight >= weight["min"] {
+				v[index] = value
+			}
+		}
+	}
+
+	return
+}

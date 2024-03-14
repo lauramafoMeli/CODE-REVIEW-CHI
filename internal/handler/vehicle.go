@@ -402,7 +402,6 @@ func (h *VehicleDefault) CreateMultiple() http.HandlerFunc {
 			"message": internal.MesgVehicleCreated,
 		})
 	}
-
 }
 
 // UpdateSpeed is a method that returns a handler for the route PATCH /vehicles/{id}/update_speed
@@ -730,6 +729,66 @@ func (h *VehicleDefault) GetByDimensions() http.HandlerFunc {
 		// process
 		// - get vehicles by dimension
 		vehicles, err := h.sv.GetByDimensions(dimensions)
+		if err != nil {
+			response.JSON(w, http.StatusNotFound, map[string]any{
+				"message": err.Error(),
+			})
+			return
+		}
+
+		// response
+		response.JSON(w, http.StatusOK, map[string]any{
+			"message": "success",
+			"data":    vehicles,
+		})
+	}
+}
+
+// GetByWeight is a method that returns a handler for the route GET /vehicles/weight?min={weight_min}&max={weight_max}
+func (h *VehicleDefault) GetByWeight() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// request
+		// - get query params
+		minWeight := r.URL.Query().Get("min")
+		maxWeight := r.URL.Query().Get("max")
+
+		weight := make(map[string]float64)
+		if minWeight != "" {
+			// - parse min weight
+			min, err := strconv.ParseFloat(minWeight, 64)
+			if err != nil {
+				response.JSON(w, http.StatusBadRequest, map[string]any{
+					"message": errors.Join(internal.ErrFieldsMissing, err).Error(),
+				})
+				return
+			}
+			// - add to weight map
+			weight["min"] = min
+		}
+
+		if maxWeight != "" {
+			// - parse max weight
+			max, err := strconv.ParseFloat(maxWeight, 64)
+			if err != nil {
+				response.JSON(w, http.StatusBadRequest, map[string]any{
+					"message": errors.Join(internal.ErrFieldsMissing, err).Error(),
+				})
+				return
+			}
+			// - add to weight map
+			weight["max"] = max
+		}
+
+		if minWeight != "" && maxWeight != "" && weight["min"] > weight["max"] {
+			response.JSON(w, http.StatusBadRequest, map[string]any{
+				"message": errors.Join(internal.ErrFieldsMissing, errors.New("invalid weight, max weight have to be greater than min weight")).Error(),
+			})
+			return
+		}
+
+		// process
+		// - get vehicles by weight
+		vehicles, err := h.sv.GetByWeight(weight)
 		if err != nil {
 			response.JSON(w, http.StatusNotFound, map[string]any{
 				"message": err.Error(),
